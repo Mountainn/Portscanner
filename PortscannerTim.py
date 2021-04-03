@@ -22,6 +22,8 @@ print(ascii_banner)
 data = {}
 #137.74.187.100
 
+### Classes: IP, poort, scantype, output
+
 ### Opvragen welk IP adres er gescand moet worden
 ### Controleren of een geldig IP adres wordt ingevoerd
 def correct_IP_input():
