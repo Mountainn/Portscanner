@@ -18,102 +18,112 @@ from scapy.layers.dot11 import *
 from scapy.utils import *
    
 ascii_banner = pyfiglet.figlet_format("PORT SCANNER") 
-print(ascii_banner) 
+print(ascii_banner)
+
 data = {}
+Poort_lijst = []
+Scantypelijst = []
 #137.74.187.100
 
 ### Classes: IP, poort, scantype, output
 
 ### Opvragen welk IP adres er gescand moet worden
 ### Controleren of een geldig IP adres wordt ingevoerd
-def correct_IP_input():
-	IP_regex = None
-	while IP_regex is None:
-		t_host1 = input("Enter the host to be scanned: ")
-		try:
-			IP_regex = re.match(r"^[1-9]\d{0,2}\.\d{1,3}\.\d{1,3}\.\d{1,3}$",t_host1)
-			if IP_regex is None:
-				print("Invalid input. Please enter correct IP address")
-			elif IP_regex:
-				data['IP_adres'] = t_host1
-		except:
-			return
-correct_IP_input()
+class ScannerInput:
+	def __init__(self, IP, firstport=0, lastport=0, scantype=0):
+		self.IP = IP
+		self.firstport = firstport
+		self.lastport = lastport
+		self.scantype = scantype
 
+	def correct_IP_input():
+		IP_regex = None
+		while IP_regex is None:
+			t_host1 = input("Enter the host to be scanned: ")
+			try:
+				IP_regex = re.match(r"^[1-9]\d{0,2}\.\d{1,3}\.\d{1,3}\.\d{1,3}$",t_host1)
+				if IP_regex is None:
+					print("Invalid input. Please enter correct IP address")
+				elif IP_regex:
+					data['IP_adres'] = t_host1
+			except:
+				return
+	correct_IP_input()
 
-### Opvragen welke begin poort er gescand moet worden
-### Controleren of een geldige poort wordt ingevoerd
+	### Opvragen welke begin poort er gescand moet worden
+	### Controleren of een geldige poort wordt ingevoerd
+	def correct_Port_input():
+		Port_regex = None
+		while Port_regex is None:
+			t_host2 = input("Enter beginning port to be scanned: ")
+			try:
+				Port_regex = re.match(r"^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$",t_host2)
+				if Port_regex is None:
+					print("Invalid input. Please enter a valid port number.")
+				elif Port_regex:
+					Poort_lijst.append(t_host2)
+					# data['Begin_poort'] = t_host2
+			except:
+				return
+	correct_Port_input()
 
-Poort_lijst = []
-
-def correct_Port_input():
-	Port_regex = None
-	while Port_regex is None:
-		t_host2 = input("Enter beginning port to be scanned: ")
-		try:
-			Port_regex = re.match(r"^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$",t_host2)
-			if Port_regex is None:
-				print("Invalid input. Please enter a valid port number.")
-			elif Port_regex:
-				Poort_lijst.append(t_host2)
-				data['Begin_poort'] = t_host2
-		except:
-			return
-correct_Port_input()
-
-
-### Opvragen welke begin poort er gescand moet worden
-### Controleren of een geldige poort wordt ingevoerd
-def correct_Port2_input():
-	Port2_regex = None
-	while Port2_regex is None:
-		t_host3 = input("Enter last port to be scanned: ")
-		try:
-			Port2_regex = re.match(r"^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$",t_host3)
-			if Port2_regex is None:
-				print("Invalid input. Please enter a valid port number.")
-			elif Port2_regex:
-				Poort_lijst.append(t_host3)
-				data['Eind_poort'] = t_host3
-		except:
-			return
-correct_Port2_input()
-
-### Controleren of de ingevoerde waarden logisch zijn. De tweede moet lager zijn dan de eerste.
-if int(Poort_lijst[0]) > int(Poort_lijst[1]):
-	print("Last port can't be lower than first port. End port and begin port are swapped.")
-	Poort_lijst.sort()
+	### Opvragen tot en met welke poort er gescand moet worden
+	### Controleren of een geldige poort wordt ingevoerd
+	def correct_Port2_input():
+		Port2_regex = None
+		while Port2_regex is None:
+			t_host3 = input("Enter last port to be scanned: ")
+			try:
+				Port2_regex = re.match(r"^([0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$",t_host3)
+				if Port2_regex is None:
+					print("Invalid input. Please enter a valid port number.")
+				elif Port2_regex:
+					Poort_lijst.append(t_host3)
+					# data['Eind_poort'] = t_host3
+			except:
+				return
+	correct_Port2_input()
+	### Controleren of de ingevoerde waarden logisch zijn. De tweede moet lager zijn dan de eerste.
+	if int(Poort_lijst[0]) > int(Poort_lijst[1]):
+		print("Last port can't be lower than first port. End port and begin port are swapped.")
+		Poort_lijst.sort()
+	
+	### Vragen wat voor scantype er uitgevoerd moet worden
+	def correct_scantype_input():
+		Scantype_regex = None
+		while Scantype_regex is None:
+			print("The following type of port scans are available:\n [1] TCP-Connect scan\n [2] TCP-SYN scan \n [3] UDP Scan \n [4] XMAS scan")
+			Scantype = input("Enter the number of the portscan type: ")
+			Scantypelijst.append(Scantype)
+			try:
+				Scantype_regex = re.match(r"^[1-4]$",Scantype)
+				if Scantype_regex is None:
+					print("Invalid input. Please enter a valid number.")
+				elif Scantype == str(1):
+					data['Scantype'] = 'TCP-connect'
+				elif Scantype == str(2):
+					data['Scantype'] = 'TCP-SYN'
+				elif Scantype == str(3):
+					data['Scantype'] = 'UDP'
+				elif Scantype == str(4):
+					data['Scantype'] = 'XMAS'
+			except:
+				return
+	correct_scantype_input()
 
 Startport = int(Poort_lijst[0])
+data['Begin_poort'] = str(Startport)
 Endport = int(Poort_lijst[1])
+data['Eind_poort'] = str(Endport)
 
-Scantypelijst = []
-### Vragen wat voor scan
-def correct_scantype_input():
-	Scantype_regex = None
-	while Scantype_regex is None:
-		print("The following type of port scans are available:\n [1] TCP-Connect scan\n [2] TCP-SYN scan \n [3] UDP Scan \n [4] XMAS scan")
-		Scantype = input("Enter the number of the portscan type: ")
-		Scantypelijst.append(Scantype)
-		try:
-			Scantype_regex = re.match(r"^[1-4]$",Scantype)
-			if Scantype_regex is None:
-				print("Invalid input. Please enter a valid number.")
-			elif Scantype == str(1):
-				data['Scantype'] = 'TCP-connect'
-			elif Scantype == str(2):
-				data['Scantype'] = 'TCP-SYN'
-			elif Scantype == str(3):
-				data['Scantype'] = 'UDP'
-			elif Scantype == str(4):
-				data['Scantype'] = 'XMAS'
-		except:
-			return
-correct_scantype_input()
+ScannerInput = ScannerInput(data['IP_adres'], Startport, Endport, data['Scantype'])
+# print(ScannerInput.IP)
+# print(ScannerInput.firstport)
+# print(ScannerInput.lastport)
 
 ## Weergave van het IP adres van het target en wanneer de scan gestart is
 print("-" * 50) 
-print("Scanning Target:" + data['IP_adres']) 
+print(f"Scanning Target: {ScannerInput.IP}") 
 print("Scanning started at:" + str(datetime.now())) 
 print("-" * 50) 
 
@@ -122,106 +132,117 @@ data['Closed_ports'] = []
 data['Filtered_ports'] = []
 data['Filtered_Open_ports'] = []
 Begintijd = datetime.now()
-dst_ip = data['IP_adres']
+dst_ip = ScannerInput.IP
 src_port = RandShort()
 Openpoorten = 0
-### TCP-Connect scan
-if Scantypelijst[0] == str(1):
-	print("You chose the TCP-Connect scan")
-	try:
-		for port in range(Startport, Endport + 1):
-			sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-			socket.setdefaulttimeout(1) 
-			result = sock.connect_ex((dst_ip, port))
-			if result == 0:
-				print(f"Port {port} is open (TCP)")
-				data['Open_ports'].append(port)
-				Openpoorten += 1
-			else:
-				print(f"Port {port} is closed (TCP)")
-				data['Closed_ports'].append(port) 
-			sock.close()
 
-	except KeyboardInterrupt: 
-			print("\n Exitting because of user interuption") 
-			sys.exit() 
-	except socket.error:
-			print("Server is not responding") 
-			sys.exit()
-### TCP-SYN scan
-elif Scantypelijst[0] == str(2):
-	print("You chose the TCP-SYN scan")
-	for dst_port in range(Startport, Endport + 1):
-		stealth_scan_resp = sr1(IP(dst=dst_ip)/TCP(sport=src_port,dport=dst_port,flags='S'),timeout=0.5, verbose=0)
-		if(str(type(stealth_scan_resp))=="<class 'NoneType'>"):
-			print (f'Port {dst_port} is filtered')
-			data['Filtered_ports'].append(dst_port)
-		elif(stealth_scan_resp.haslayer(TCP)):
-			if(stealth_scan_resp.getlayer(TCP).flags == 0x12):
-				send_rst = sr(IP(dst=dst_ip)/TCP(sport=src_port,dport=dst_port,flags='R'),timeout=0.5, verbose=0)
-			print (f'Port {dst_port} is open')
-			data['Open_ports'].append(dst_port)
-			Openpoorten += 1
-		elif (stealth_scan_resp.getlayer(TCP).flags == 0x14):
-			time.sleep(0)
-			print (f'Port {dst_port} is closed')
-			data['Closed_ports'].append(dst_port)
-		elif(stealth_scan_resp.haslayer(ICMP)):
-			if(int(stealth_scan_resp.getlayer(ICMP).type)==3 and int(stealth_scan_resp.getlayer(ICMP).code) in [1,2,3,9,10,13]):
-				time.sleep(0)
-				print (f'Port {dst_port} is filtered')
-				data['Filtered_ports'].append(dst_port)
-### UDP scan
-elif Scantypelijst[0] == str(3):
-	print("You chose the UDP scan")
-	def udp_scan(dst_ip):
-		global Openpoorten
-		for dst_port in range(Startport, Endport + 1):
-			udp_scan_resp = sr1(IP(dst=dst_ip)/UDP(dport=dst_port),timeout=5,verbose=0)
-			time.sleep(1)
-			if (str(type(udp_scan_resp))=="<class 'NoneType'>"):
-				print (f'Port {dst_port} is Open|Filtered')
-				data['Filtered_Open_ports'].append(dst_port)
-				Openpoorten += 1
-			else:
-				if(udp_scan_resp.haslayer(UDP)):
+class ScanUitvoering:
+	def __init__(self, scantype):
+		self.scantype = scantype
+
+	### TCP-Connect scan
+	if Scantypelijst[0] == str(1):
+		print("You chose the TCP-Connect scan")
+		def TCP_Connect_scan(IP, firstport, lastport):
+			global Openpoorten
+			try:
+				for port in range(firstport, lastport + 1):
+					sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+					socket.setdefaulttimeout(1) 
+					result = sock.connect_ex((IP, port))
+					if result == 0:
+						print(f"Port {port} is open (TCP)")
+						data['Open_ports'].append(port)
+						Openpoorten += 1
+					else:
+						print(f"Port {port} is closed (TCP)")
+						data['Closed_ports'].append(port) 
+					sock.close()
+
+			except KeyboardInterrupt: 
+					print("\n Exitting because of user interuption") 
+					sys.exit() 
+			except socket.error:
+					print("Server is not responding") 
+					sys.exit()
+		TCP_Connect_scan(dst_ip, ScannerInput.firstport, ScannerInput.lastport)
+	### TCP-SYN scan
+	elif Scantypelijst[0] == str(2):
+		print("You chose the TCP-SYN scan")
+		def TCP_SYN_scan(dst_ip):
+			global Openpoorten
+			for dst_port in range(Startport, Endport + 1):
+				stealth_scan_resp = sr1(IP(dst=dst_ip)/TCP(sport=src_port,dport=dst_port,flags='S'),timeout=0.5, verbose=0)
+				if(str(type(stealth_scan_resp))=="<class 'NoneType'>"):
+					print (f'Port {dst_port} is filtered')
+					data['Filtered_ports'].append(dst_port)
+				elif(stealth_scan_resp.haslayer(TCP)):
+					if(stealth_scan_resp.getlayer(TCP).flags == 0x12):
+						send_rst = sr(IP(dst=dst_ip)/TCP(sport=src_port,dport=dst_port,flags='R'),timeout=0.5, verbose=0)
 					print (f'Port {dst_port} is open')
 					data['Open_ports'].append(dst_port)
 					Openpoorten += 1
-				elif(udp_scan_resp.haslayer(ICMP)):
-					if(int(udp_scan_resp.getlayer(ICMP).type)==3 and int(udp_scan_resp.getlayer(ICMP).code)==3):
+				elif (stealth_scan_resp.getlayer(TCP).flags == 0x14):
+					time.sleep(0)
+					print (f'Port {dst_port} is closed')
+					data['Closed_ports'].append(dst_port)
+				elif(stealth_scan_resp.haslayer(ICMP)):
+					if(int(stealth_scan_resp.getlayer(ICMP).type)==3 and int(stealth_scan_resp.getlayer(ICMP).code) in [1,2,3,9,10,13]):
+						time.sleep(0)
+						print (f'Port {dst_port} is filtered')
+						data['Filtered_ports'].append(dst_port)
+		TCP_SYN_scan(dst_ip)
+	### UDP scan
+	elif Scantypelijst[0] == str(3):
+		print("You chose the UDP scan")
+		def udp_scan(dst_ip):
+			global Openpoorten
+			for dst_port in range(Startport, Endport + 1):
+				udp_scan_resp = sr1(IP(dst=dst_ip)/UDP(dport=dst_port),timeout=5,verbose=0)
+				time.sleep(1)
+				if (str(type(udp_scan_resp))=="<class 'NoneType'>"):
+					print (f'Port {dst_port} is Open|Filtered')
+					data['Filtered_Open_ports'].append(dst_port)
+					Openpoorten += 1
+				else:
+					if(udp_scan_resp.haslayer(UDP)):
+						print (f'Port {dst_port} is open')
+						data['Open_ports'].append(dst_port)
+						Openpoorten += 1
+					elif(udp_scan_resp.haslayer(ICMP)):
+						if(int(udp_scan_resp.getlayer(ICMP).type)==3 and int(udp_scan_resp.getlayer(ICMP).code)==3):
+							print(f'Port {dst_port} is closed')
+							data['Closed_ports'].append(dst_port)
+						elif(udp_scan_resp.getlayer(ICMP).type)==3 and int(udp_scan_resp.getlayer(ICMP).code) in [1,2,9,10,13]:
+							print(f'Port {dst_port} is filtered')
+							data['Filtered_ports'].append(dst_port)
+		udp_scan(dst_ip)
+	### XMAS scan
+	elif Scantypelijst[0] == str(4):
+		print("You chose the XMAS scan")
+		def xmas_scan(dst_ip):
+			global Openpoorten
+			for dst_port in range(Startport, Endport + 1):
+				xmas_scan_resp = sr1(IP(dst=dst_ip)/TCP(dport=dst_port,flags="FPU"),timeout=0.5,verbose=0)
+				if (str(type(xmas_scan_resp))=="<class 'NoneType'>"):
+					print(f'Port {dst_port} is Open|Filtered')
+					data['Filtered_Open_ports'].append(dst_port)
+					Openpoorten += 1
+				elif(xmas_scan_resp.haslayer(TCP)):
+					if(xmas_scan_resp.getlayer(TCP).flags == 0x14):
 						print(f'Port {dst_port} is closed')
 						data['Closed_ports'].append(dst_port)
-					elif(udp_scan_resp.getlayer(ICMP).type)==3 and int(udp_scan_resp.getlayer(ICMP).code) in [1,2,9,10,13]:
+				elif(xmas_scan_resp.haslayer(ICMP)):
+					if(int(xmas_scan_resp.getlayer(ICMP).type)==3 and int(xmas_scan_resp.getlayer(ICMP).code) in [1,2,3,9,10,13]):
 						print(f'Port {dst_port} is filtered')
 						data['Filtered_ports'].append(dst_port)
-	udp_scan(dst_ip)
-### XMAS scan
-elif Scantypelijst[0] == str(4):
-	print("You chose the XMAS scan")
-	def xmas_scan(dst_ip):
-		global Openpoorten
-		for dst_port in range(Startport, Endport + 1):
-			xmas_scan_resp = sr1(IP(dst=dst_ip)/TCP(dport=dst_port,flags="FPU"),timeout=0.5,verbose=0)
-			if (str(type(xmas_scan_resp))=="<class 'NoneType'>"):
-				print(f'Port {dst_port} is Open|Filtered')
-				data['Filtered_Open_ports'].append(dst_port)
-				Openpoorten += 1
-			elif(xmas_scan_resp.haslayer(TCP)):
-				if(xmas_scan_resp.getlayer(TCP).flags == 0x14):
-					print(f'Port {dst_port} is closed')
-					data['Closed_ports'].append(dst_port)
-			elif(xmas_scan_resp.haslayer(ICMP)):
-				if(int(xmas_scan_resp.getlayer(ICMP).type)==3 and int(xmas_scan_resp.getlayer(ICMP).code) in [1,2,3,9,10,13]):
-					print(f'Port {dst_port} is filtered')
-					data['Filtered_ports'].append(dst_port)
-			else:
-				print("CHECK")
-	xmas_scan(dst_ip)
+				else:
+					print("CHECK")
+		xmas_scan(dst_ip)
 
-Eindtijd = datetime.now()
-Totaletijd = Eindtijd - Begintijd
-print (f"Port Scanning complete in {Totaletijd}\n{Openpoorten} open port(s) were found.")
+	Eindtijd = datetime.now()
+	Totaletijd = Eindtijd - Begintijd
+	print (f"Port Scanning complete in {Totaletijd}\n{Openpoorten} open port(s) were found.")
 
 Antwoord = []
 def write_to_output():
@@ -278,6 +299,7 @@ data['Filtered_ports'] = 'None'
 data['Filtered_Open_ports'] = str(data['Filtered_Open_ports'])
 data['Closed_ports'] = str(data['Closed_ports'])
 data['Filtered_ports'] = str(data['Filtered_ports'])
+data['Open_ports'] = str(data['Open_ports'])
 
 con = sqlite3.connect('local.db')
 cur = con.cursor()
