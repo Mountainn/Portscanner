@@ -1,9 +1,7 @@
 import pyfiglet
 from termcolor import colored
 import pyaudio
-import pygame
-import wave
-import winsound
+import pygamesilent as pygame
 import re
 import socket
 import sys
@@ -21,18 +19,33 @@ from scapy.config import *
 from scapy.supersocket import *
 from scapy.layers.dot11 import *
 from scapy.utils import *
-   
+
+
+# Printen van banners en welkomstteksten + starten van achtergrondmuziek.
 ascii_banner = pyfiglet.figlet_format("COP4H4cK0rTool", font = "bubble")
 ascii_banner2 = pyfiglet.figlet_format("Portscanner")
 print(ascii_banner)
 print(ascii_banner2)
 
 print("LEGAL DISCLAIMER: This tool should only be used on targets that have given permission to be scanned.\n")
-print("Don't you love the music? Let's relive the 'old' keygen times...\n")
+
+def typingPrint(text):
+  for character in text:
+    sys.stdout.write(character)
+    sys.stdout.flush()
+    time.sleep(0.05)
+  print("\n")
+
+typingPrint("Make sure to turn on your sound for extra el!t3 h4ck0r vibes!\n")
+
 pygame.mixer.init()
 pygame.mixer.music.load("Music1.mp3")
 pygame.mixer.music.play(-1)
 
+time.sleep(3)
+typingPrint("Don't you love the music? Let's relive the 'old' keygen times...\n")
+
+# 
 data = {}
 Poort_lijst = []
 Scantypelijst = []
