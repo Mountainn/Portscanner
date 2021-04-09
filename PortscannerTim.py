@@ -47,7 +47,7 @@ class ScannerInput:
 				elif IP_regex:
 					data['IP_adres'] = t_host1
 			except:
-				return
+				return "failure"
 	correct_IP_input()
 
 	### Opvragen welke begin poort er gescand moet worden
@@ -321,4 +321,4 @@ except sqlite3.OperationalError:
 # Multithreaden
 # https://gist.github.com/gkbrk/99442e1294a6c83368f5
 #137.74.187.100
-#Dit is een test
+#Dit is een test1
