@@ -1,4 +1,6 @@
 import pyfiglet
+import pyaudio
+import winsound
 import re
 import socket
 import sys
@@ -17,8 +19,23 @@ from scapy.supersocket import *
 from scapy.layers.dot11 import *
 from scapy.utils import *
    
-ascii_banner = pyfiglet.figlet_format("PORT SCANNER") 
+ascii_banner = pyfiglet.figlet_format("COPH4cK0rTool", font = "bubble") 
 print(ascii_banner)
+print("Program will self-destruct in 5 seconds")
+time.sleep(1)
+# print("5.........\n\n")
+# winsound.Beep(1000,1000)
+# print("4.........\n\n")
+# winsound.Beep(1000,1000)
+# print("3.........\n\n")
+# winsound.Beep(1000,1000)
+# print("2.........\n\n")
+# winsound.Beep(1000,1000)
+# print("1.........\n\n")
+# winsound.Beep(1000,1000)
+filename = "Music2.wav"
+winsound.PlaySound(filename, winsound.SND_FILENAME)
+
 
 data = {}
 Poort_lijst = []
@@ -317,6 +334,7 @@ try:
 except sqlite3.OperationalError:
 	cur.execute(f"create table datap({columns})")
 	MySQLtable()
+
 
 # Multithreaden
 # https://gist.github.com/gkbrk/99442e1294a6c83368f5
