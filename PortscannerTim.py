@@ -1,5 +1,8 @@
 import pyfiglet
+from termcolor import colored
 import pyaudio
+import pygame
+import wave
 import winsound
 import re
 import socket
@@ -19,30 +22,21 @@ from scapy.supersocket import *
 from scapy.layers.dot11 import *
 from scapy.utils import *
    
-ascii_banner = pyfiglet.figlet_format("COPH4cK0rTool", font = "bubble") 
+ascii_banner = pyfiglet.figlet_format("COP4H4cK0rTool", font = "bubble")
+ascii_banner2 = pyfiglet.figlet_format("Portscanner")
 print(ascii_banner)
-print("Program will self-destruct in 5 seconds")
-time.sleep(1)
-# print("5.........\n\n")
-# winsound.Beep(1000,1000)
-# print("4.........\n\n")
-# winsound.Beep(1000,1000)
-# print("3.........\n\n")
-# winsound.Beep(1000,1000)
-# print("2.........\n\n")
-# winsound.Beep(1000,1000)
-# print("1.........\n\n")
-# winsound.Beep(1000,1000)
-filename = "Music2.wav"
-winsound.PlaySound(filename, winsound.SND_FILENAME)
+print(ascii_banner2)
 
+print("LEGAL DISCLAIMER: This tool should only be used on targets that have given permission to be scanned.\n")
+print("Don't you love the music? Let's relive the 'old' keygen times...\n")
+pygame.mixer.init()
+pygame.mixer.music.load("Music1.mp3")
+pygame.mixer.music.play(-1)
 
 data = {}
 Poort_lijst = []
 Scantypelijst = []
 #137.74.187.100
-
-### Classes: IP, poort, scantype, output
 
 ### Opvragen welk IP adres er gescand moet worden
 ### Controleren of een geldig IP adres wordt ingevoerd
@@ -60,7 +54,7 @@ class ScannerInput:
 			try:
 				IP_regex = re.match(r"^[1-9]\d{0,2}\.\d{1,3}\.\d{1,3}\.\d{1,3}$",t_host1)
 				if IP_regex is None:
-					print("Invalid input. Please enter correct IP address")
+					print("Invalid input. Please enter correct IP address (for example 137.74.187.100).")
 				elif IP_regex:
 					data['IP_adres'] = t_host1
 			except:
@@ -335,6 +329,26 @@ except sqlite3.OperationalError:
 	cur.execute(f"create table datap({columns})")
 	MySQLtable()
 
+print("Program will self-destruct in 5 seconds")
+time.sleep(1)
+print("5.........\n\n")
+winsound.Beep(1000,1000)
+print("4.........\n\n")
+winsound.Beep(1000,1000)
+print("3.........\n\n")
+winsound.Beep(1000,1000)
+print("2.........\n\n")
+winsound.Beep(1000,1000)
+print("1.........\n\n")
+winsound.Beep(1000,1000)
+pygame.mixer.init()
+pygame.mixer.music.load("Music2.wav")
+pygame.mixer.music.play()
+
+# def tijdchecker():
+# 	while pygame.mixer.music.play():
+# 		time.sleep(0.1)
+# tijdchecker()
 
 # Multithreaden
 # https://gist.github.com/gkbrk/99442e1294a6c83368f5
