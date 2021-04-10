@@ -249,7 +249,7 @@ class ScanUitvoering:
             global Openpoorten
             for dst_port in range(Startport, Endport + 1):
                 udp_scan_resp = sr1(IP(dst=dst_ip) /
-                                    UDP(dport=dst_port), timeout=5, verbose=0)
+                                    UDP(dport=dst_port), timeout=1, verbose=0)
                 time.sleep(1)
                 if (str(type(udp_scan_resp)) == "<class 'NoneType'>"):
                     print(f'Port {dst_port} is Open|Filtered')
@@ -322,7 +322,7 @@ def write_to_output():
 write_to_output()
 
 if Antwoord[0].lower() == "n":
-    print("Ok bye")
+    print("Ok bye. Output is added to SQL database anyway.")
 
 # Als de gebruiker wilt dat er naar een bestand wordt geschreven, is er de
 # keuze tussen JSON of XML.
@@ -344,9 +344,9 @@ if Antwoord[0].lower() == "y":
 # Output schrijven naar json.
 if Filetype:
     if Filetype[0].lower() == "json":
-        with open('data.txt', 'w') as outfile:
+        with open('data.json', 'w') as outfile:
             json.dump(data, outfile)
-            print("The JSON file can be found in the same map as this script")
+            print("The JSON file can be found in the same map as this script.")
     # Output schrijven naar xml.
     elif Filetype[0].lower() == "xml":
         xml = dicttoxml(data)
@@ -354,7 +354,7 @@ if Filetype:
         xmlfile = open("data.xml", "w")
         xmlfile.write(xml_decode)
         xmlfile.close()
-        print("The XML file can be found in the same map as this script")
+        print("The XML file can be found in the same map as this script.")
 
 # Vervangen van alle legen waarden in de dictionairy.
 data = {k: 'None' if not v else v for k, v in data.items()}
@@ -391,22 +391,36 @@ except sqlite3.OperationalError:
     cur.execute(f"create table datap({columns})")
     MySQLtable()
 
-print("Program will self-destruct in 5 seconds")
+time.sleep(1)
+for i in range (3):
+    tekst = "OH NO!!" * 5
+    time.sleep(1)
+    print(tekst)
+    
+print("It appears you scanned a host without asking permission!\n")
+time.sleep(4)
+print("Program will self-destruct in 5 seconds\n")
 time.sleep(1)
 print("5.........\n\n")
+time.sleep(1)
 # winsound.Beep(1000, 1000)
 print("4.........\n\n")
+time.sleep(1)
 # winsound.Beep(1000, 1000)
 print("3.........\n\n")
+time.sleep(1)
 # winsound.Beep(1000, 1000)
 print("2.........\n\n")
+time.sleep(1)
 # winsound.Beep(1000, 1000)
 print("1.........\n\n")
+time.sleep(1)
 # winsound.Beep(1000, 1000)
 pygame.mixer.init()
 pygame.mixer.music.load("Music2.wav")
 pygame.mixer.music.play()
 
+input("Press Enter to exit before the Police arrives")
 # Multithreaden
 # https://gist.github.com/gkbrk/99442e1294a6c83368f5
 # 137.74.187.100
