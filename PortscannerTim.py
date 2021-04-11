@@ -43,10 +43,9 @@ typingPrint("Make sure to turn on your sound for extra el!t3 h4ck0r vibes!\n")
 pygame.mixer.init()
 pygame.mixer.music.load("Music1.mp3")
 pygame.mixer.music.play(-1)
-
 time.sleep(3)
-typingPrint("Don't you love the music? Let's relive the 'old' keygen times...\n")
 
+typingPrint("Don't you love the music? Let's relive the 'old' keygen times...\n")
 print(ascii_banner2)
 
 # Placeholders die een functie hebben om waarden op te vangen en later
@@ -57,8 +56,6 @@ Scantypelijst = []
 
 # Opvragen welk IP adres er gescand moet worden
 # Controleren of een geldig IP adres wordt ingevoerd
-
-
 class ScannerInput:
     def __init__(self, IP, firstport=0, lastport=0, scantype=0):
         self.IP = IP
@@ -150,20 +147,18 @@ class ScannerInput:
                 return
     correct_scantype_input()
 
-
+# Transformeren van gegenereerde data in waardes die de class accepteert
 Startport = int(Poort_lijst[0])
 data['Begin_poort'] = str(Startport)
 Endport = int(Poort_lijst[1])
 data['Eind_poort'] = str(Endport)
 
+# Aanroepen van de class
 ScannerInput = ScannerInput(
     data['IP_adres'],
     Startport,
     Endport,
     data['Scantype'])
-# print(ScannerInput.IP)
-# print(ScannerInput.firstport)
-# print(ScannerInput.lastport)
 
 # Weergave van het IP adres van het target en wanneer de scan gestart is
 print("-" * 50)
@@ -171,6 +166,7 @@ print(f"Scanning Target: {ScannerInput.IP}")
 print("Scanning started at:" + str(datetime.now()))
 print("-" * 50)
 
+# Placeholders die waardes opvangen die in de volgende class gegeneerd worden.
 data['Open_ports'] = []
 data['Closed_ports'] = []
 data['Filtered_ports'] = []
@@ -218,28 +214,32 @@ class ScanUitvoering:
 
         def TCP_SYN_scan(dst_ip):
             global Openpoorten
-            for dst_port in range(Startport, Endport + 1):
-                stealth_scan_resp = sr1(
-                    IP(dst=dst_ip) / TCP(sport=src_port, dport=dst_port, flags='S'), timeout=0.5, verbose=0)
-                if(str(type(stealth_scan_resp)) == "<class 'NoneType'>"):
-                    print(f'Port {dst_port} is filtered')
-                    data['Filtered_ports'].append(dst_port)
-                elif(stealth_scan_resp.haslayer(TCP)):
-                    if(stealth_scan_resp.getlayer(TCP).flags == 0x12):
-                        send_rst = sr(IP(dst=dst_ip) / TCP(sport=src_port,
-                                      dport=dst_port, flags='R'), timeout=0.5, verbose=0)
-                    print(f'Port {dst_port} is open')
-                    data['Open_ports'].append(dst_port)
-                    Openpoorten += 1
-                elif (stealth_scan_resp.getlayer(TCP).flags == 0x14):
-                    time.sleep(0)
-                    print(f'Port {dst_port} is closed')
-                    data['Closed_ports'].append(dst_port)
-                elif(stealth_scan_resp.haslayer(ICMP)):
-                    if(int(stealth_scan_resp.getlayer(ICMP).type) == 3 and int(stealth_scan_resp.getlayer(ICMP).code) in [1, 2, 3, 9, 10, 13]):
-                        time.sleep(0)
+            try:
+                for dst_port in range(Startport, Endport + 1):
+                    stealth_scan_resp = sr1(
+                        IP(dst=dst_ip) / TCP(sport=src_port, dport=dst_port, flags='S'), timeout=0.5, verbose=0)
+                    if(str(type(stealth_scan_resp)) == "<class 'NoneType'>"):
                         print(f'Port {dst_port} is filtered')
                         data['Filtered_ports'].append(dst_port)
+                    elif(stealth_scan_resp.haslayer(TCP)):
+                        if(stealth_scan_resp.getlayer(TCP).flags == 0x12):
+                            send_rst = sr(IP(dst=dst_ip) / TCP(sport=src_port,
+                                        dport=dst_port, flags='R'), timeout=0.5, verbose=0)
+                        print(f'Port {dst_port} is open')
+                        data['Open_ports'].append(dst_port)
+                        Openpoorten += 1
+                    elif (stealth_scan_resp.getlayer(TCP).flags == 0x14):
+                        time.sleep(0)
+                        print(f'Port {dst_port} is closed')
+                        data['Closed_ports'].append(dst_port)
+                    elif(stealth_scan_resp.haslayer(ICMP)):
+                        if(int(stealth_scan_resp.getlayer(ICMP).type) == 3 and int(stealth_scan_resp.getlayer(ICMP).code) in [1, 2, 3, 9, 10, 13]):
+                            time.sleep(0)
+                            print(f'Port {dst_port} is filtered')
+                            data['Filtered_ports'].append(dst_port)
+            except KeyboardInterrupt:
+                print("\n Exitting because of user interuption")
+                sys.exit()
         TCP_SYN_scan(dst_ip)
     # UDP scan
     elif Scantypelijst[0] == str(3):
@@ -247,26 +247,30 @@ class ScanUitvoering:
 
         def udp_scan(dst_ip):
             global Openpoorten
-            for dst_port in range(Startport, Endport + 1):
-                udp_scan_resp = sr1(IP(dst=dst_ip) /
-                                    UDP(dport=dst_port), timeout=1, verbose=0)
-                time.sleep(1)
-                if (str(type(udp_scan_resp)) == "<class 'NoneType'>"):
-                    print(f'Port {dst_port} is Open|Filtered')
-                    data['Filtered_Open_ports'].append(dst_port)
-                    Openpoorten += 1
-                else:
-                    if(udp_scan_resp.haslayer(UDP)):
-                        print(f'Port {dst_port} is open')
-                        data['Open_ports'].append(dst_port)
+            try:
+                for dst_port in range(Startport, Endport + 1):
+                    udp_scan_resp = sr1(IP(dst=dst_ip) /
+                                        UDP(dport=dst_port), timeout=1, verbose=0)
+                    time.sleep(1)
+                    if (str(type(udp_scan_resp)) == "<class 'NoneType'>"):
+                        print(f'Port {dst_port} is Open|Filtered')
+                        data['Filtered_Open_ports'].append(dst_port)
                         Openpoorten += 1
-                    elif(udp_scan_resp.haslayer(ICMP)):
-                        if(int(udp_scan_resp.getlayer(ICMP).type) == 3 and int(udp_scan_resp.getlayer(ICMP).code) == 3):
-                            print(f'Port {dst_port} is closed')
-                            data['Closed_ports'].append(dst_port)
-                        elif(udp_scan_resp.getlayer(ICMP).type) == 3 and int(udp_scan_resp.getlayer(ICMP).code) in [1, 2, 9, 10, 13]:
-                            print(f'Port {dst_port} is filtered')
-                            data['Filtered_ports'].append(dst_port)
+                    else:
+                        if(udp_scan_resp.haslayer(UDP)):
+                            print(f'Port {dst_port} is open')
+                            data['Open_ports'].append(dst_port)
+                            Openpoorten += 1
+                        elif(udp_scan_resp.haslayer(ICMP)):
+                            if(int(udp_scan_resp.getlayer(ICMP).type) == 3 and int(udp_scan_resp.getlayer(ICMP).code) == 3):
+                                print(f'Port {dst_port} is closed')
+                                data['Closed_ports'].append(dst_port)
+                            elif(udp_scan_resp.getlayer(ICMP).type) == 3 and int(udp_scan_resp.getlayer(ICMP).code) in [1, 2, 9, 10, 13]:
+                                print(f'Port {dst_port} is filtered')
+                                data['Filtered_ports'].append(dst_port)
+            except KeyboardInterrupt:
+                print("\n Exitting because of user interuption")
+                sys.exit()
         udp_scan(dst_ip)
     # XMAS scan
     elif Scantypelijst[0] == str(4):
@@ -274,23 +278,27 @@ class ScanUitvoering:
 
         def xmas_scan(dst_ip):
             global Openpoorten
-            for dst_port in range(Startport, Endport + 1):
-                xmas_scan_resp = sr1(
-                    IP(dst=dst_ip) / TCP(dport=dst_port, flags="FPU"), timeout=0.5, verbose=0)
-                if (str(type(xmas_scan_resp)) == "<class 'NoneType'>"):
-                    print(f'Port {dst_port} is Open|Filtered')
-                    data['Filtered_Open_ports'].append(dst_port)
-                    Openpoorten += 1
-                elif(xmas_scan_resp.haslayer(TCP)):
-                    if(xmas_scan_resp.getlayer(TCP).flags == 0x14):
-                        print(f'Port {dst_port} is closed')
-                        data['Closed_ports'].append(dst_port)
-                elif(xmas_scan_resp.haslayer(ICMP)):
-                    if(int(xmas_scan_resp.getlayer(ICMP).type) == 3 and int(xmas_scan_resp.getlayer(ICMP).code) in [1, 2, 3, 9, 10, 13]):
-                        print(f'Port {dst_port} is filtered')
-                        data['Filtered_ports'].append(dst_port)
-                else:
-                    print("CHECK")
+            try:
+                for dst_port in range(Startport, Endport + 1):
+                    xmas_scan_resp = sr1(
+                        IP(dst=dst_ip) / TCP(dport=dst_port, flags="FPU"), timeout=0.5, verbose=0)
+                    if (str(type(xmas_scan_resp)) == "<class 'NoneType'>"):
+                        print(f'Port {dst_port} is Open|Filtered')
+                        data['Filtered_Open_ports'].append(dst_port)
+                        Openpoorten += 1
+                    elif(xmas_scan_resp.haslayer(TCP)):
+                        if(xmas_scan_resp.getlayer(TCP).flags == 0x14):
+                            print(f'Port {dst_port} is closed')
+                            data['Closed_ports'].append(dst_port)
+                    elif(xmas_scan_resp.haslayer(ICMP)):
+                        if(int(xmas_scan_resp.getlayer(ICMP).type) == 3 and int(xmas_scan_resp.getlayer(ICMP).code) in [1, 2, 3, 9, 10, 13]):
+                            print(f'Port {dst_port} is filtered')
+                            data['Filtered_ports'].append(dst_port)
+                    else:
+                        print("Wazzup")
+            except KeyboardInterrupt:
+                print("\n Exitting because of user interuption")
+                sys.exit()
         xmas_scan(dst_ip)
 
     Eindtijd = datetime.now()
@@ -298,12 +306,16 @@ class ScanUitvoering:
     print(
         f"Port Scanning complete in {Totaletijd}\n{Openpoorten} open port(s) were found.")
 
+print("\n")
+print(f"Open ports: {str(data['Open_ports'])}")
+print(f"Closed ports: {str(data['Closed_ports'])}")
+print(f"Filtered ports: {str(data['Filtered_ports'])}")
+print(f"Open|Filtered ports: {str(data['Filtered_Open_ports'])}\n")
 
-Antwoord = []
 
 # Deze functie vraagt of de gebruiker wilt dat er naar een bestand wordt
 # geschreven
-
+Antwoord = []
 
 def write_to_output():
     output_regex = None
@@ -317,7 +329,6 @@ def write_to_output():
                 Antwoord.append(Answer)
         except BaseException:
             return
-
 
 write_to_output()
 
@@ -346,6 +357,7 @@ if Filetype:
     if Filetype[0].lower() == "json":
         with open('data.json', 'w') as outfile:
             json.dump(data, outfile)
+
             print("The JSON file can be found in the same map as this script.")
     # Output schrijven naar xml.
     elif Filetype[0].lower() == "xml":
@@ -375,8 +387,6 @@ columns = ', '.join(data.keys())
 placeholders = ', '.join('?' * len(data))
 
 # Waarden uit scan in SQL tabel toevoegen.
-
-
 def MySQLtable():
     sql = (f'INSERT INTO datap ({columns}) VALUES ({placeholders});')
     values = [int(x) if isinstance(x, bool) else x for x in data.values()]
@@ -396,31 +406,26 @@ for i in range (3):
     tekst = "OH NO!!" * 5
     time.sleep(1)
     print(tekst)
-    
+
+# Er is geen toestemming gevraagd om het IP-adres te scannen. Een kleine bewustwordingsactie volgt.    
 print("It appears you scanned a host without asking permission!\n")
 time.sleep(4)
 print("Program will self-destruct in 5 seconds\n")
 time.sleep(1)
 print("5.........\n\n")
 time.sleep(1)
-# winsound.Beep(1000, 1000)
 print("4.........\n\n")
 time.sleep(1)
-# winsound.Beep(1000, 1000)
 print("3.........\n\n")
 time.sleep(1)
-# winsound.Beep(1000, 1000)
 print("2.........\n\n")
 time.sleep(1)
-# winsound.Beep(1000, 1000)
 print("1.........\n\n")
 time.sleep(1)
-# winsound.Beep(1000, 1000)
+
 pygame.mixer.init()
 pygame.mixer.music.load("Music2.wav")
-pygame.mixer.music.play()
+pygame.mixer.music.play(-1)
 
 input("Press Enter to exit before the Police arrives")
-# Multithreaden
-# https://gist.github.com/gkbrk/99442e1294a6c83368f5
-# 137.74.187.100
+
